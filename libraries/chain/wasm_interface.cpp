@@ -854,6 +854,7 @@ class console_api : public context_aware_api {
       :context_aware_api(ctx,true){}
 
       void prints(null_terminated_ptr str) {
+         std::cout << str.value;
          context.console_append<const char*>(str);
       }
 
@@ -862,10 +863,12 @@ class console_api : public context_aware_api {
       }
 
       void printui(uint64_t val) {
+         std::cout << val;
          context.console_append(val);
       }
 
       void printi(int64_t val) {
+         std::cout << val;
          context.console_append(val);
       }
 
@@ -883,6 +886,7 @@ class console_api : public context_aware_api {
       }
 
       void printn(const name& value) {
+         std::cout << value.to_string();
          context.console_append(value.to_string());
       }
 

@@ -521,8 +521,11 @@ namespace eosio { namespace testing {
    vector<char> base_tester::get_row_by_account( uint64_t code, uint64_t scope, uint64_t table, const account_name& act ) {
       vector<char> data;
       const auto& db = control->get_database();
+
+      //std::cout << "tester2: " << code << "," << scope << "," << table << std::endl;
       const auto* t_id = db.find<chain::contracts::table_id_object, chain::contracts::by_code_scope_table>( boost::make_tuple( code, scope, table ) );
       if ( !t_id ) {
+         std::cout << "no encuentro la tabla " << std::endl;
          return data;
       }
       //FC_ASSERT( t_id != 0, "object not found" );
@@ -531,6 +534,7 @@ namespace eosio { namespace testing {
 
       auto itr = idx.lower_bound( boost::make_tuple( t_id->id, act ) );
       if ( itr == idx.end() || itr->t_id != t_id->id || act.value != itr->primary_key ) {
+         std::cout << "no encuentro el record" << std::endl;
          return data;
       }
 

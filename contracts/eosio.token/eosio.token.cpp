@@ -17,6 +17,8 @@ void token::create( account_name issuer,
 
     auto sym = maximum_supply.symbol;
     eosio_assert( sym.is_valid(), "invalid symbol name" );
+    eosio_assert( maximum_supply.is_valid(), "invalid supply");
+    eosio_assert( maximum_supply.amount > 0, "max-supply must be positive");
 
     stats statstable( _self, sym.name() );
     auto existing = statstable.find( sym.name() );
@@ -43,9 +45,10 @@ void token::issue( account_name to, asset quantity, string memo )
     require_auth( st.issuer );
     eosio_assert( quantity.is_valid(), "invalid quantity" );
     eosio_assert( quantity.amount > 0, "must issue positive quantity" );
+    eosio_assert( quantity <= st.max_supply - st.supply, "quantity exceeds available supply");
 
     statstable.modify( st, 0, [&]( auto& s ) {
-       s.supply.amount += quantity.amount;
+       s.supply += quantity;
     });
 
     add_balance( st.issuer, quantity, st, st.issuer );
@@ -95,7 +98,7 @@ void token::sub_balance( account_name owner, asset value, const currency_stats& 
    }
 
    from_acnts.modify( from, owner, [&]( auto& a ) {
-       a.balance.amount -= value.amount;
+       a.balance -= value;
    });
 }
 
@@ -111,7 +114,7 @@ void token::add_balance( account_name owner, asset value, const currency_stats& 
    } else {
       eosio_assert( !st.enforce_whitelist || to->whitelist, "receiver requires whitelist by issuer" );
       to_acnts.modify( to, 0, [&]( auto& a ) {
-        a.balance.amount += value.amount;
+        a.balance += value;
       });
    }
 }
